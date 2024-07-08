@@ -1,0 +1,69 @@
+function generateRandomCustomer() {
+  const specificNames = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"];
+  const professions = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"];
+
+  const randomName = specificNames[Math.floor(Math.random() * specificNames.length)];
+  const randomAge = Math.floor(Math.random() * 50 + 20);
+  const randomAddress = "Address" + Math.floor(Math.random() * 1000);
+  const randomEmail = randomName.toLowerCase() + "@email.com";
+  const randomPhoneNumber = "123-456-789";
+  const randomProfession = professions[Math.floor(Math.random() * professions.length)];
+
+  return {
+    name: randomName,
+    age: randomAge,
+    address: randomAddress,
+    email: randomEmail,
+    phoneNumber: randomPhoneNumber,
+    profession: randomProfession
+  };
+}
+
+
+const countDocuments = 1000000
+const randomCustomers = [];
+
+for (let i = 0; i < countDocuments; i++) {
+  randomCustomers.push(generateRandomCustomer());
+}
+
+
+const batchSize = 10000;
+
+for (let i = 0; i < randomCustomers.length; i += batchSize) {
+  const batch = randomCustomers.slice(i, i + batchSize);
+  db.customers.insertMany(batch);
+}
+
+
+db.customers.getIndexes();
+
+db.runCommand({collStats: "customers"});
+
+db.customers.findOne();
+
+db.customers.find({name:"A1", age:36}).explain("executionStats");
+
+db.customers.createIndex({age:1}, {name: "IDX_AGE"});
+
+db.customers.getIndexes();
+
+db.customers.find({name:"A1", age:36}).explain("executionStats");
+
+db.customers.dropIndex("IDX_AGE");
+
+db.customers.getIndexes();
+
+db.customers.createIndex({email: 1, age: 1}, {name: "IDX_EMAIL_AGE"});
+
+db.customers.dropIndex("IDX_EMAIL_AGE");
+
+db.customers.createIndex({age: 1, email: 1}, {name: "IDX_AGE_EMAIL"});
+
+db.customers.dropIndex("IDX_AGE_EMAIL");
+
+db.customers.createIndex({name: 1, age: 1}, {name: "IDX_NAME_AGE"});
+
+db.customers.dropIndex("IDX_NAME_AGE");
+
+db.customers.createIndex({name: 1, age: 1}, {name: "IDX_AGE_NAME"});
